@@ -1,0 +1,14 @@
+
+export const config = {
+    twitter: {
+        appKey: '',
+        appSecret: '',
+        accessToken: '',
+        accessSecret: '',
+    },
+    // ShapeDiver Geometry Backend Model to use
+    shapediver: {
+        modelViewUrl: '',
+        ticket: '',
+    }
+}
