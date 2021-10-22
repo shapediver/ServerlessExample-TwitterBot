@@ -9,7 +9,7 @@ interface IResult {
   error?: Error
 }
 
-const hashtag = "#legodiver"
+const search = "shapediver"
 
 export const process = async (event : EventBridgeEvent<string, any>, _context : Context) : Promise<IResult> => {
   
@@ -17,8 +17,8 @@ export const process = async (event : EventBridgeEvent<string, any>, _context : 
 
     console.debug('Event: ', JSON.stringify(event))
 
-    const tweets = await fetchTweets(hashtag)
-    console.log(`Fetched ${tweets.length} ${hashtag} tweets`, tweets)
+    const tweets = await fetchTweets(search)
+    console.log(`Fetched ${tweets.length} ${search} tweets`, tweets)
 
     if (tweets.length === 0) {
       console.log("No tweets")

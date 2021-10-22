@@ -10,9 +10,9 @@
     "logs": "export AWS_PROFILE=serverless_cli; sls logs -f process"
   },
   "dependencies": {
-    "@shapediver/sdk.geometry-api-sdk-v2": "^1.0.5",
+    "@shapediver/sdk.geometry-api-sdk-v2": "^1.0.6",
     "aws-sdk": "^2.997.0",
-    "node-fetch": "^3.0.0",
+    "axios": "^0.23.0",
     "parse-json": "^5.2.0",
     "twitter-api-v2": "^1.5.2"
   },

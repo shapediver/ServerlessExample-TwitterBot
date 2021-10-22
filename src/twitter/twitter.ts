@@ -1,4 +1,4 @@
-import { TweetV2, TwitterApi } from 'twitter-api-v2'
+import { TweetV2, TweetV2SingleResult, TwitterApi } from 'twitter-api-v2'
 import { asyncForEach } from '../util/utils';
 import { config } from '../../config'
 
@@ -8,6 +8,13 @@ export interface ITweet {
     id: string
     text: string
     imageUrl: string
+}
+
+const getTweetImageUrl = (tweet: TweetV2SingleResult) : string | null => {
+    if (tweet.includes?.media?.length > 0) {
+        return tweet.includes.media.find(t => t.url)?.url
+    }
+    return null
 }
 
 export const fetchTweets = async (search : string) : Promise<ITweet[]> => {
@@ -25,11 +32,12 @@ export const fetchTweets = async (search : string) : Promise<ITweet[]> => {
             "expansions": "attachments.media_keys",
         })
 
-        if (tweet.includes && tweet.includes.media) {
+        const imageUrl = getTweetImageUrl(tweet)
+        if (imageUrl) {
             foundTweets.push({
                 id: t.id,
                 text: tweet.data.text,
-                imageUrl: tweet.includes?.media[0].url
+                imageUrl: imageUrl
             })
         }
 

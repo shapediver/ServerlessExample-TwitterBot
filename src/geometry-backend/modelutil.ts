@@ -1,9 +1,5 @@
-import * as node_fetch from "node-fetch"
-//@ts-ignore because node.js does not have fetch
-global.fetch = node_fetch.default
-const fetch = node_fetch.default
 import { create, ShapeDiverResponseExportDefinition, ShapeDiverResponseOutputDefinition, ShapeDiverResponseExportDefinitionType, ShapeDiverRequestCustomization, ShapeDiverResponseExport, ShapeDiverResponseOutput } from "@shapediver/sdk.geometry-api-sdk-v2"
-import { getSessionId, submitAndWaitForCustomization, submitAndWaitForExport } from "./geometry-backend-sdk-utils"
+import axios from "axios"
 
 export interface IRunModelInput {
     text: string
@@ -92,29 +88,23 @@ export const runModel = async (input: IRunModelInput, config: IModelConfig) : Pr
     }
 
     // fetch input image
-    const res1 = await fetch(input.imageUrl)
-    if (!res1.ok) {
+    const imageResponse = await axios.get<ArrayBuffer>(input.imageUrl, {responseType: 'arraybuffer'})
+    if (imageResponse.status !== 200) {
         throw new Error (`Could not fetch image from ${input.imageUrl}`)
     }
-    const inputImageBlob = await res1.blob()
-    if ( !paramImage.format.includes(inputImageBlob.type) ) {
-        throw new Error (`The image input parameter does not accept image type ${inputImageBlob.type}`)
+    const imageArrayBuffer = imageResponse.data
+    const imageContentType = imageResponse.headers['content-type']
+    if ( !paramImage.format.includes(imageContentType) ) {
+        throw new Error (`The image input parameter does not accept image type ${imageContentType}`)
     }
-    if ( paramImage.max < inputImageBlob.size ) {
-        throw new Error (`The image input parameter does not accept images whose size exceeds ${paramImage.max} (${inputImageBlob.size})`)
+    if ( paramImage.max < imageResponse.data.byteLength ) {
+        throw new Error (`The image input parameter does not accept images whose size exceeds ${paramImage.max} (${imageArrayBuffer.byteLength})`)
     }
     
     // upload the image
-    // TODO to be simplified, there should be a function in the SDK for getting the session id
-    // see https://shapediver.atlassian.net/browse/SS-3573
-    const sessionid = getSessionId(dto)    
-    const uploadRequest = await sdk.file.upload(sessionid, {[paramImage.id]: {format: inputImageBlob.type, size: inputImageBlob.size}})
+    const uploadRequest = await sdk.file.requestUpload(dto.session, {[paramImage.id]: {format: imageContentType, size: imageArrayBuffer.byteLength}})
     const uploadDefinition = uploadRequest.asset.file[paramImage.id]
-    // TODO to be simplified, see https://shapediver.atlassian.net/browse/SS-3573
-    const uploadResult = await fetch(uploadDefinition.href, {body: inputImageBlob, method: "PUT"})
-    if (uploadResult.status !== 200 && uploadResult.status !== 201) {
-        throw new Error (`Could not upload image`)
-    }
+    await sdk.utils.upload(uploadDefinition.href, imageArrayBuffer, imageContentType)
     
     /**
      * Customization and export request
@@ -125,8 +115,8 @@ export const runModel = async (input: IRunModelInput, config: IModelConfig) : Pr
         [paramImage.id]: uploadDefinition.id,
         [paramText.id]: input.text
     }
-    const customizationResult = await submitAndWaitForCustomization(sdk, dto, customizationBody)
-
+    const customizationResult = await sdk.utils.submitAndWaitForCustomization(sdk, dto.session, customizationBody)
+  
     // check customization result
     const customizationResultContent = (customizationResult.outputs[outputText.id] as ShapeDiverResponseOutput).content
     if (customizationResultContent.length < 1) {
@@ -134,7 +124,7 @@ export const runModel = async (input: IRunModelInput, config: IModelConfig) : Pr
     }
 
     // send and wait for export request
-    const exportResult = await submitAndWaitForExport(sdk, dto, {
+    const exportResult = await sdk.utils.submitAndWaitForExport(sdk, dto.session, {
         exports: { 
             id: exportImage.id
         },
