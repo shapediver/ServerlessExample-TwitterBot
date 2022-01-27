@@ -13,7 +13,7 @@ const serverlessConfiguration: Serverless = {
    
   },
   // Add the serverless-webpack plugin
-  plugins: ['serverless-bundle'],
+  plugins: ['serverless-bundle','serverless-plugin-log-retention'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -26,7 +26,8 @@ const serverlessConfiguration: Serverless = {
     },
     deploymentBucket: {
       name: "shapediver-serverlessdeploy-${self:provider.region}"
-    }
+    },
+    logRetentionInDays: 30
   },
   functions: {
     process: {
