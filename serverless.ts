@@ -1,22 +1,16 @@
 import { Serverless } from 'serverless/aws';
 
 const serverlessConfiguration: Serverless = {
-  unresolvedVariablesNotificationMode: "error",
-  service: {
-    name: 'sls-legobot',
-    // app and org for use with dashboard.serverless.com
-    //org: 'shapediver',
-    //app: 'cloudformation-macro-expand-parameters'
-  },
-  frameworkVersion: '>=1.72.0',
+  service: 'sls-legobot',
+  frameworkVersion: '>=3.22.0',
   custom: {
    
   },
-  // Add the serverless-webpack plugin
+  // Add the serverless-bundle plugin
   plugins: ['serverless-bundle','serverless-plugin-log-retention'],
   provider: {
     name: 'aws',
-    runtime: 'nodejs14.x',
+    runtime: 'nodejs16.x',
     stage: "${opt:stage, 'dev'}",
     region: "${opt:region, 'us-east-1'}",
     timeout: 180,

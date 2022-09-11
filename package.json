@@ -10,17 +10,18 @@
     "logs": "export AWS_PROFILE=serverless_cli; sls logs -f process"
   },
   "dependencies": {
-    "@shapediver/sdk.geometry-api-sdk-v2": "^1.0.15",
-    "aws-sdk": "^2.1064.0",
-    "axios": "^0.25.0",
+    "@shapediver/sdk.geometry-api-sdk-v2": "^1.0.26",
+    "aws-sdk": "^2.1213.0",
+    "axios": "^0.27.2",
     "parse-json": "^6.0.2",
-    "twitter-api-v2": "^1.10.0"
+    "twitter-api-v2": "^1.12.5"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.92",
-    "@types/node": "^17.0.12",
-    "@types/serverless": "^1.78.44",
-    "serverless-bundle": "^5.2.0"
+    "@types/aws-lambda": "^8.10.103",
+    "@types/node": "^18.7.16",
+    "@types/serverless": "^3.12.8",
+    "serverless-bundle": "^5.5.0",
+    "serverless-plugin-log-retention": "^2.0.0"
   },
   "author": "ShapeDiver GmbH",
   "license": "MIT"

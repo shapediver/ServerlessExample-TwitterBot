@@ -102,7 +102,7 @@ export const runModel = async (input: IRunModelInput, config: IModelConfig) : Pr
     }
     
     // upload the image
-    const uploadRequest = await sdk.file.requestUpload(dto.session, {[paramImage.id]: {format: imageContentType, size: imageArrayBuffer.byteLength}})
+    const uploadRequest = await sdk.file.requestUpload(dto.sessionId, {[paramImage.id]: {format: imageContentType, size: imageArrayBuffer.byteLength}})
     const uploadDefinition = uploadRequest.asset.file[paramImage.id]
     await sdk.utils.upload(uploadDefinition.href, imageArrayBuffer, imageContentType)
     
@@ -115,7 +115,7 @@ export const runModel = async (input: IRunModelInput, config: IModelConfig) : Pr
         [paramImage.id]: uploadDefinition.id,
         [paramText.id]: input.text
     }
-    const customizationResult = await sdk.utils.submitAndWaitForCustomization(sdk, dto.session, customizationBody)
+    const customizationResult = await sdk.utils.submitAndWaitForCustomization(sdk, dto.sessionId, customizationBody)
   
     // check customization result
     const customizationResultContent = (customizationResult.outputs[outputText.id] as ShapeDiverResponseOutput).content
@@ -124,7 +124,7 @@ export const runModel = async (input: IRunModelInput, config: IModelConfig) : Pr
     }
 
     // send and wait for export request
-    const exportResult = await sdk.utils.submitAndWaitForExport(sdk, dto.session, {
+    const exportResult = await sdk.utils.submitAndWaitForExport(sdk, dto.sessionId, {
         exports: { 
             id: exportImage.id
         },
