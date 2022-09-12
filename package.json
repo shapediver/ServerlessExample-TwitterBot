@@ -1,7 +1,7 @@
 {
-  "name": "sls-legobot",
+  "name": "sls-twitterbot",
   "version": "1.0.0",
-  "description": "Serverless ShapeDiver Lego Bot",
+  "description": "Serverless ShapeDiver Twitter Bot",
   "main": "handler.js",
   "scripts": {
     "local": "export AWS_PROFILE=serverless_cli; sls invoke local -f process",

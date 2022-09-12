@@ -1,7 +1,7 @@
 import { Serverless } from 'serverless/aws';
 
 const serverlessConfiguration: Serverless = {
-  service: 'sls-legobot',
+  service: 'sls-twitterbot',
   frameworkVersion: '>=3.22.0',
   custom: {
    
