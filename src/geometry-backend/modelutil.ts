@@ -1,4 +1,4 @@
-import { create, ShapeDiverResponseExportDefinition, ShapeDiverResponseOutputDefinition, ShapeDiverResponseExportDefinitionType, ShapeDiverRequestCustomization, ShapeDiverResponseExport, ShapeDiverResponseOutput } from "@shapediver/sdk.geometry-api-sdk-v2"
+import { create, ShapeDiverResponseExportDefinition, ShapeDiverResponseOutputDefinition, ShapeDiverResponseExportDefinitionType, ShapeDiverRequestCustomization, ShapeDiverResponseExport, ShapeDiverResponseOutput, ShapeDiverResponseModelComputationStatus } from "@shapediver/sdk.geometry-api-sdk-v2"
 import axios from "axios"
 
 export interface IRunModelInput {
@@ -124,16 +124,24 @@ export const runModel = async (input: IRunModelInput, config: IModelConfig) : Pr
     }
 
     // send and wait for export request
-    const exportResult = await sdk.utils.submitAndWaitForExport(sdk, dto.sessionId, {
+    const result = await sdk.utils.submitAndWaitForExport(sdk, dto.sessionId, {
         exports: { 
             id: exportImage.id
         },
         parameters: customizationBody,
+        // a ShapeDiverError will be thrown in case max_wait_time is exceeded
         max_wait_time: 30000
     })
 
     // check export result
-    const exportResultContent = (exportResult.exports[exportImage.id] as ShapeDiverResponseExport).content
+    const exportResult = result.exports[exportImage.id] as ShapeDiverResponseExport;
+    if (exportResult.status_computation !== ShapeDiverResponseModelComputationStatus.SUCCESS) {
+        throw new Error (`Export computation failed: ${exportResult.status_computation}`)
+    }
+    if (exportResult.status_collect !== ShapeDiverResponseModelComputationStatus.SUCCESS) {
+        throw new Error (`Saving of export results failed: ${exportResult.status_collect}`)
+    }
+    const exportResultContent = exportResult.content
     if (exportResultContent.length < 1) {
         throw new Error (`Export result content is empty`)
     }
